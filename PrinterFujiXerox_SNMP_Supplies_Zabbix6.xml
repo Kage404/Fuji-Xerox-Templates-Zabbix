@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>6.4</version>
+    <template_groups>
+        <template_group>
+            <uuid>104b901bc0ab4b638f3226dbabcbcfb7</uuid>
+            <name>Templates/Printers</name>
+        </template_group>
+    </template_groups>
+    <templates>
+        <template>
+            <uuid>b01cb2118db042a9b2447f53a1aebbb7</uuid>
+            <template>Printer SNMP Fuji Xerox by Rizqi</template>
+            <name>Printer SNMP Fuji Xerox by Rizqi</name>
+            <description>Template for enterprise printers with SNMP monitoring including supplies (Toner, Drum, Waste).</description>
+            <vendor>
+                <name>Custom</name>
+                <version>1.0</version>
+            </vendor>
+            <groups>
+                <group>
+                    <name>Templates/Printers</name>
+                </group>
+            </groups>
+            <items>
+                <!-- ICMP Ping for Printer Status -->
+                <item>
+                    <uuid>7c211cd25ef449909249764f69189b83</uuid>
+                    <name>ICMP ping</name>
+                    <type>SIMPLE</type>
+                    <key>icmpping</key>
+                    <delay>1m</delay>
+                    <history>1w</history>
+                    <value_type>UNSIGNED</value_type>
+                    <valuemap>
+                        <name>Service state</name>
+                    </valuemap>
+                    <triggers>
+                        <trigger>
+                            <uuid>481da53fa46b41cb8b7c3d10c2ab0c8b</uuid>
+                            <expression>max(/Printer SNMP Fuji Xerox by Rizqi/icmpping,#3)=0</expression>
+                            <name>Printer is unavailable by ICMP ping</name>
+                            <priority>HIGH</priority>
+                            <description>Last three attempts returned timeout. Please check device connectivity.</description>
+                        </trigger>
+                    </triggers>
+                </item>
+                <!-- Total Page Counter -->
+                <item>
+                    <uuid>e77db8b7a42b41f7a01caebbb1cc5510</uuid>
+                    <name>Total Page Counter</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>1.3.6.1.2.1.43.10.2.1.4.1.1</snmp_oid>
+                    <key>printer.pagecount</key>
+                    <delay>5m</delay>
+                    <history>1w</history>
+                    <value_type>UNSIGNED</value_type>
+                </item>
+            </items>
+            <!-- Supplies Discovery -->
+            <discovery_rules>
+                <discovery_rule>
+                    <uuid>a6c30f81d1ba42cbb9339e767bb174bb</uuid>
+                    <name>Printer Supplies Discovery</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.43.11.1.1.6.1]</snmp_oid>
+                    <key>printer.supplies.discovery</key>
+                    <delay>5m</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <uuid>91b00f13ab114e998e3b7bb577aacc11</uuid>
+                            <name>{#SNMPVALUE} Max</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.2.1.43.11.1.1.8.1.{#SNMPINDEX}</snmp_oid>
+                            <key>printer.supply.max[{#SNMPINDEX}]</key>
+                            <delay>5m</delay>
+                            <history>1w</history>
+                            <value_type>FLOAT</value_type>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>f1a63b018b104c88a3136ab771bb5561</uuid>
+                            <name>{#SNMPVALUE} Current</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>1.3.6.1.2.1.43.11.1.1.9.1.{#SNMPINDEX}</snmp_oid>
+                            <key>printer.supply.current[{#SNMPINDEX}]</key>
+                            <delay>5m</delay>
+                            <history>1w</history>
+                            <value_type>FLOAT</value_type>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>c88b71131b1c4b9ab0b7136cbbb71465</uuid>
+                            <name>{#SNMPVALUE} Percentage</name>
+                            <type>CALCULATED</type>
+                            <key>printer.supply.percent[{#SNMPINDEX}]</key>
+                            <delay>5m</delay>
+                            <history>1w</history>
+                            <value_type>FLOAT</value_type>
+                            <units>%</units>
+                            <params>last(//printer.supply.current[{#SNMPINDEX}]) / last(//printer.supply.max[{#SNMPINDEX}]) * 100</params>
+                        </item_prototype>
+                    </item_prototypes>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <uuid>657f2df2ec5c477b8b4202c388efd158</uuid>
+                            <expression>last(/Printer SNMP Fuji Xerox by Rizqi/printer.supply.percent[{#SNMPINDEX}])&lt;10 and last(/Printer SNMP Fuji Xerox by Rizqi/printer.supply.percent[{#SNMPINDEX}])&gt;=5</expression>
+                            <name>{#SNMPVALUE} Low (&lt;10%)</name>
+                            <priority>WARNING</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <uuid>d3aab7069c9b4562b8045f448e89cd3e</uuid>
+                            <expression>last(/Printer SNMP Fuji Xerox by Rizqi/printer.supply.percent[{#SNMPINDEX}])&lt;5 and last(/Printer SNMP Fuji Xerox by Rizqi/printer.supply.percent[{#SNMPINDEX}])&gt;0</expression>
+                            <name>{#SNMPVALUE} Critical (&lt;5%)</name>
+                            <priority>HIGH</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <uuid>d1b017bb18a149cda013bc73711b66b0</uuid>
+                            <expression>last(/Printer SNMP Fuji Xerox by Rizqi/printer.supply.percent[{#SNMPINDEX}])=0</expression>
+                            <name>{#SNMPVALUE} Empty</name>
+                            <priority>HIGH</priority>
+                        </trigger_prototype>
+                    </trigger_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <uuid>8b7f3a2c5d1e49c8a4f2e1d7c6b5a4f3</uuid>
+                            <name>Supply: {#SNMPVALUE} Level (%)</name>
+                            <ymin_type_1>FIXED</ymin_type_1>
+                            <ymax_type_1>FIXED</ymax_type_1>
+                            <yaxismin>0</yaxismin>
+                            <yaxismax>100</yaxismax>
+                            <graph_items>
+                                <graph_item>
+                                    <color>2774A4</color>
+                                    <item>
+                                        <host>Printer SNMP Fuji Xerox by Rizqi</host>
+                                        <key>printer.supply.percent[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <uuid>2a1b3c4d5e6f47a8b9c0d1e2f3a4b5c6</uuid>
+                            <name>Supply: {#SNMPVALUE} Capacity vs Max</name>
+                            <graph_items>
+                                <graph_item>
+                                    <color>999999</color>
+                                    <item>
+                                        <host>Printer SNMP Fuji Xerox by Rizqi</host>
+                                        <key>printer.supply.max[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>1A7C11</color>
+                                    <item>
+                                        <host>Printer SNMP Fuji Xerox by Rizqi</host>
+                                        <key>printer.supply.current[{#SNMPINDEX}]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+            <tags>
+                <tag>
+                    <tag>class</tag>
+                    <value>printer</value>
+                </tag>
+                <tag>
+                    <tag>target</tag>
+                    <value>snmp</value>
+                </tag>
+            </tags>
+            <valuemaps>
+                <valuemap>
+                    <uuid>137ad2925b744033b006734c4423b054</uuid>
+                    <name>Service state</name>
+                    <mappings>
+                        <mapping>
+                            <value>0</value>
+                            <newvalue>Down</newvalue>
+                        </mapping>
+                        <mapping>
+                            <value>1</value>
+                            <newvalue>Up</newvalue>
+                        </mapping>
+                    </mappings>
+                </valuemap>
+            </valuemaps>
+        </template>
+    </templates>
+    <graphs>
+        <graph>
+            <uuid>5f8c8b2a3d7f46a9b4e1d5c2e3a1f8b7</uuid>
+            <name>Printer: Total Page Counter</name>
+            <graph_items>
+                <graph_item>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Printer SNMP Fuji Xerox by Rizqi</host>
+                        <key>printer.pagecount</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
+</zabbix_export>
