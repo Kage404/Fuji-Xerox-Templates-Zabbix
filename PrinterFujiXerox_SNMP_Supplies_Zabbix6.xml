@@ -12,7 +12,7 @@
             <uuid>b01cb2118db042a9b2447f53a1aebbb7</uuid>
             <template>Printer SNMP Fuji Xerox by Rizqi</template>
             <name>Printer SNMP Fuji Xerox by Rizqi</name>
-            <description>Template for enterprise printers with SNMP monitoring including supplies (Toner, Drum, Waste).</description>
+            <description>Template for enterprise printers with SNMP monitoring including supplies (Toner, Drum, Waste), Device Info, and Page Counter.</description>
             <vendor>
                 <name>Custom</name>
                 <version>1.0</version>
@@ -23,6 +23,69 @@
                 </group>
             </groups>
             <items>
+                <!-- Device Name -->
+                <item>
+                    <uuid>f1e2d3c4b5a647b89c0d1e2f3a4b5c6d</uuid>
+                    <name>Device Name</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>.1.3.6.1.2.1.1.5.0</snmp_oid>
+                    <key>system.name</key>
+                    <delay>1h</delay>
+                    <history>1w</history>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <inventory_link>NAME</inventory_link>
+                    <preprocessing>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>1d</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </item>
+                <!-- Device Location -->
+                <item>
+                    <uuid>a1b2c3d4e5f647a8bc9d0e1f2a3b4c5d</uuid>
+                    <name>Device Location</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>.1.3.6.1.2.1.1.6.0</snmp_oid>
+                    <key>system.location</key>
+                    <delay>1h</delay>
+                    <history>1w</history>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <inventory_link>LOCATION</inventory_link>
+                    <preprocessing>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>1d</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </item>
+                <!-- Serial Number -->
+                <item>
+                    <uuid>1a2b3c4d5e6f47a89b0c1d2e3f4a5b6c</uuid>
+                    <name>Serial Number</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>.1.3.6.1.2.1.43.5.1.1.17.1</snmp_oid>
+                    <key>system.hw.serialnumber</key>
+                    <delay>1h</delay>
+                    <history>1w</history>
+                    <trends>0</trends>
+                    <value_type>CHAR</value_type>
+                    <inventory_link>SERIALNO_A</inventory_link>
+                    <preprocessing>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>1d</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                </item>
                 <!-- ICMP Ping for Printer Status -->
                 <item>
                     <uuid>7c211cd25ef449909249764f69189b83</uuid>
